@@ -1,4 +1,5 @@
 import numpy as np
+from helpers import *
 
 # FORWARD FUNCTIONS
 def conv_forward(A_prev, W, b, hparameters):
@@ -63,7 +64,7 @@ def pool_forward(A_prev, hparameters):
                 for c in range(n_C):
                     a_prev_slice = a_prev[vert_start:vert_end, horiz_start:horiz_end, c]
                     A[i, h, w, c] = np.max(a_prev_slice)
-    print("Maxed.")
+    print("Maxed")
     print("-----------------------------------------------")
 
     # Store the input and hparameters in "cache" for pool_backward()

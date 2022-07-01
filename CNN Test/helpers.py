@@ -18,16 +18,21 @@ def create_mask_from_window(x):
     return mask
 
 def flatten(X):
+    return np.ravel(X).reshape(X.shape[0], -1)
     return np.reshape(X, (np.shape(X)[0],-1))
 
-def loss(Y_hat, Y):
-    return -1/len(Y) * np.sum(Y * np.log(Y_hat) + (1-Y) * (np.log(1-Y_hat)))
+def log_loss(Y_hat, Y):
+    m = Y_hat.shape[0]
+    loss = -1/len(Y) * np.sum(Y * np.log(Y_hat) + (1-Y) * (np.log(1-Y_hat)))
+    error = np.sum(np.abs(np.round(Y_hat) - Y)) / m
 
+    return loss, error
 
 def relu(Z):
     return Z * (Z > 0)
 
-def sigmoid(Z):
+def sigmoid_f(Z):
+    Z = Z.astype(float)
     return 1 / (1 + np.exp(-Z))
 
 def sigmoid_derivative(Z):

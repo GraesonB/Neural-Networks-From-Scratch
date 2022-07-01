@@ -73,9 +73,9 @@ def load_cats_dogs_25k():
     train, dev, test = split_data(data)
     return train, dev, test
 
-def load_cats_dogs_64():
+def load_cats_dogs_300():
     data = np.load(npy_dir + "/cats_dogs_25k.npy", allow_pickle = True)
-    return data[0][:64], data[1][:64]
+    return data[0][:300], data[1][:300]
 
 def load_cats_dogs_1k():
     data = np.load(npy_dir + "/cats_dogs_25k.npy", allow_pickle = True)
