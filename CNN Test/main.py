@@ -1,21 +1,30 @@
 import numpy as np
-import PIL as pil
+from PIL import Image
 
+from model import Model
 from base_classes import *
 from modules import *
 import datasets as data
 from function_layers import *
+from mlxtend.data import loadlocal_mnist
 
-# Hyper params ----------------------------------------------------------------#
+# Hyperparams -----------------------------------------------------------------#
 conv_hparams = {
-"channels" : 3,
+"channels" : 6,
 "f" : 5,
 "stride" : 2,
 "pad" : 1
 }
 
 conv_hparams2 = {
-"channels" : 4,
+"channels" : 10,
+"f" : 5,
+"stride" : 2,
+"pad" : 1
+}
+
+conv_hparams3 = {
+"channels" : 10,
 "f" : 5,
 "stride" : 2,
 "pad" : 0
@@ -23,85 +32,80 @@ conv_hparams2 = {
 
 pool_hparams = {
 "stride" : 2,
-"pad" : 1,
+"pad" : 0,
 "f" : 2
 }
 
 fully_con_hparams = {
-"nodes" : 20
+"nodes" : 256
 }
 
 fully_con_hparams2 = {
+"nodes" : 128
+}
+
+fully_con_hparams_f = {
 "nodes" : 1
 }
 
-learning_rate = 0.07
+model_hparams = {
+"learning_rate" : 0.0001,
+"epochs" : 100,
+"batch_size" : 64,
+"beta_1" : 0.9,
+"beta_2" : 0.999,
+}
+# when loss doesn't improve let the learning rate decrease
+# loss doesn't always converge to 0 specieally in image dataset. It could be like 30!!
+# check with your validation set to see whether your model is overfitting or underfitting
+# Things to implement: setting right initialization, batch_norm, learning rate scheduling
+# learning rate scheduling : cosine learning rate scheduler, learning rate decay, schedule learning rate decrease
+np.random.seed(0)
 
 # Program ---------------------------------------------------------------------#
 
 if __name__ == "__main__":
-    train_X, train_Y = data.load_cats_dogs_300()
-    train_X, train_Y = np.stack(train_X), np.reshape(train_Y, (-1, 1))
-    train_X = train_X / 255
+    print("Loading data...")
+    train, _, _ = data.load_cats_dogs_25k()
+    train[1] = np.reshape(train[1], (-1, 1))
+    print("Building model...")
+
     cnn = CNN(conv_hparams)
-    relu = Relu()
-    pool = Pool(pool_hparams)
     cnn2 = CNN(conv_hparams2)
-    relu2 = Relu()
+
+    pool = Pool(pool_hparams)
     pool2 = Pool(pool_hparams)
-    fc = FC(fully_con_hparams)
+
+    batch_norm = BatchNorm()
+    batch_norm2 = BatchNorm()
+    batch_norm3 = BatchNorm()
+    batch_norm4 = BatchNorm()
+    batch_norm5 = BatchNorm()
+
+
+    relu = Relu()
+    relu2 = Relu()
     relu3 = Relu()
-    fc2 = FC(fully_con_hparams2)
+    relu4 = Relu()
+    relu5 = Relu()
+    relu6 = Relu()
+    relu7 = Relu()
+
+    fc = FC(fully_con_hparams)
+    fc2 = FC(fully_con_hparams)
+    fc3 = FC(fully_con_hparams)
+    fc4 = FC(fully_con_hparams2)
+    fc5 = FC(fully_con_hparams2)
+    fc6 = FC(fully_con_hparams2)
+    fc7 = FC(fully_con_hparams2)
+    fc_final = FC(fully_con_hparams_f)
+
     sigmoid = Sigmoid()
+    flatten = Flatten()
 
-    model = [cnn, relu, pool, cnn2, relu2, pool2, fc, relu3, fc2, sigmoid]
+    modules = [cnn, batch_norm, relu, pool, cnn2, batch_norm5, relu5, flatten, 
+    fc, batch_norm2, relu2, fc2, batch_norm3, relu3, fc_final, sigmoid]
 
-    previous = train_X
-    for module in model:
-        if isinstance(module, Layer):
-            previous = module.initialize_matrices(previous)
+    cnn_model = Model(modules, train, model_hparams)
 
-    for i in range(100):
-        print("Loop: " + str(i + 1))
-        print("")
-        print("CNN 1 in progress.")
-        Z1 = cnn.forward(train_X)
-        A1 = relu.forward(Z1)
-        P1 = pool.forward(A1)
-        print("CNN 2 in progress.")
-        Z2 = cnn2.forward(P1)
-        A2 = relu2.forward(Z2)
-        P2 = pool2.forward(A2)
-        print("FCs in progress.")
-        Z3 = fc.forward(P2)
-        A3 = relu3.forward(Z3)
-        Z4  = fc2.forward(A3)
-        Y_pred = sigmoid.forward(Z4)
-        J, error = log_loss(Y_pred, train_Y)
-        print("---------------------")
-        print("LOSS: " + str(J))
-        print("ERROR: " + str(error))
-        print("---------------------")
-        dZ = Y_pred - train_Y
-        print("")
-        print("Backprop in progress.")
-        fc2.backward(dZ)
-        relu3.backward(fc2.dx)
-        fc.backward(relu3.dx)
-        pool2.backward(fc.dx)
-        relu2.backward(pool2.dx)
-        print("CNN backprop in progress.")
-        cnn2.backward(relu2.dx)
-        pool.backward(cnn2.dx)
-        relu.backward(pool.dx)
-        cnn.backward(relu.dx)
-        for module in model:
-            if isinstance(module, Layer) and module.has_weights:
-                module.update_weights(learning_rate)
-
-    # flatten = flatten(P1)
-    # Z2 = fc.forward(flatten)
-    # Y_hat = sigmoid(Z2)
-    # J = loss(Y_hat, train_Y)
-    # dZ4 = Y_hat - train_Y
-    # dZ2 = fc.backward(dZ4, Z2, "relu")
+    cnn_model.run_model()
