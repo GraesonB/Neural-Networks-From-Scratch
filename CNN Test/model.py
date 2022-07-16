@@ -1,20 +1,22 @@
-from helpers import *
-from base_classes import *
-from modules import *
+from others.helpers import *
+from others.base_classes import *
 from PIL import Image
 
 class Model:
-    def __init__(self, modules, train, hparameters):
+    def __init__(self, modules, train, test, hparameters):
         self.learning_rate = hparameters["learning_rate"]
         self.epochs = hparameters["epochs"]
         self.batch_size = hparameters["batch_size"]
         self.beta_1 = hparameters["beta_1"]
         self.beta_2 = hparameters["beta_2"]
+        self.lambd = hparameters["lambd"]
 
         self.modules = modules
         self.number_of_mods = len(modules)
         self.train_X = train[0] / 255
         self.train_Y = train[1]
+        self.test_X = test[0] / 255
+        self.test_Y = test[1]
         self.total_batches = int(np.ceil(len(self.train_X) / self.batch_size))
         self.batch_number = 0
         self.batch_start, self.batch_end = 0, self.batch_size
@@ -44,8 +46,8 @@ class Model:
 
     def model_forward(self):
         previous_out = self.train_X[self.batch_start:self.batch_end]
+        print("Forward in progress...")
         for idx, module in enumerate(self.modules):
-            print("Forward in progress: " + str(idx + 1) + "/" + str(self.number_of_mods))
             previous_out = module.forward(previous_out)
         Y_pred = previous_out
         return Y_pred
@@ -54,13 +56,10 @@ class Model:
         dout = Y_pred - self.train_Y[self.batch_start:self.batch_end]
         # iterate through modules in reverse order
         reversed_modules = list(reversed(self.modules))
+        print("Backward in progress...")
         for idx, module in enumerate(reversed_modules):
-            print("Backward in progress: " + str(idx + 1) + "/" + str(self.number_of_mods))
-            if idx == 0:
-                module.backward(dout)
-                continue
-            dout = reversed_modules[idx - 1].dx
-            module.backward(dout)
+            dout = module.backward(dout)
+
 
     def calculate_loss(self, Y_pred):
         J, acc = binary_cross_entropy_loss(Y_pred, self.train_Y[self.batch_start:self.batch_end])

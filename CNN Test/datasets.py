@@ -3,7 +3,6 @@ import random
 from PIL import Image
 from matplotlib.image import imread
 import os
-from mlxtend.data import loadlocal_mnist
 
 image_size = (128,128)
 cat_path = 'PetImages/cats_resized'
@@ -72,17 +71,19 @@ def split_data(data, train_proportion = 0.6):
 def load_cats_dogs_25k():
     data = np.load(npy_dir + "/cats_dogs_25k.npy", allow_pickle = True)
     train, dev, test = split_data(data)
-    return train, dev[0:10], test[0:10]
-
-def load_cats_dogs_64():
-    data = np.load(npy_dir + "/cats_dogs_25k.npy", allow_pickle = True)
-    return data[0][:64], data[1][:64]
+    return train, dev, test
 
 def load_cats_dogs_1k():
-    data = np.load(npy_dir + "/cats_dogs_25k.npy", allow_pickle = True)
-    return data[0][:2000], data[1][:2000]
+    data = np.load(npy_dir + "/cats_dogs_1k.npy", allow_pickle = True)
+    train, dev, test = split_data(data)
+    return train, dev, set
 
 if __name__ == "__main__":
+    pass
+    # data = np.load(npy_dir + "/cats_dogs_25k.npy", allow_pickle = True)
+    # data = [data[0][:1000], data[1][0:1000]]
+    # np.save("PetImages/npy files/cats_dogs_1k", data, allow_pickle = True)
+
     # train, dev, test = load_cats_dogs_25k()
     # X, Y = load_cats_dogs_64()
     # print("Train shape: " + str(np.shape(train[0])))
@@ -92,16 +93,14 @@ if __name__ == "__main__":
     # print("Dev set length: " + str(len(dev[0])))
     # print("Test set length: " + str(len(test[0])))
     # print('')
-    train_X, train_Y = loadlocal_mnist(images_path='train-images-idx3-ubyte', labels_path='train-labels-idx1-ubyte')
-    train_X = np.reshape(train_X, (train_X.shape[0], 28, 28))
 
-    print(train_X.shape)
-    print(train_Y.shape)
-    print(train_X[0])
+    # print(train_X.shape)
+    # print(train_Y.shape)
+    # print(train_X[0])
     # data, _, _ = load_cats_dogs_25k()
     # X = data[0]
     # Y = data[1]
-    pic = 1011
-    image = Image.fromarray(train_X[pic])
-    print(train_Y[pic])
-    image.show()
+    # pic = 1011
+    # image = Image.fromarray(train_X[pic])
+    # print(train_Y[pic])
+    # image.show()
