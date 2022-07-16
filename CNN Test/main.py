@@ -11,11 +11,10 @@ from layers.fully_connected import FCLayer
 from layers.max_pool import Pool
 from layers.batch_norm import BatchNorm
 
-
 # Hyperparams -----------------------------------------------------------------#
 conv_hparams = {
 "channels" : 6,
-"f" : 5,
+"f" : 5, # filter size
 "stride" : 2,
 "pad" : 1
 }
@@ -54,14 +53,11 @@ fully_con_hparams_f = {
 
 model_hparams = {
 "learning_rate" : 0.0001,
-"lambd" : 0.5,
-"epochs" : 100,
+"epochs" : 10,
 "batch_size" : 64,
 "beta_1" : 0.9,
 "beta_2" : 0.999,
 }
-
-np.random.seed(0)
 
 # Program ---------------------------------------------------------------------#
 
@@ -82,30 +78,21 @@ if __name__ == "__main__":
     batch_norm2 = BatchNorm()
     batch_norm3 = BatchNorm()
     batch_norm4 = BatchNorm()
-    batch_norm5 = BatchNorm()
 
     relu = Relu()
     relu2 = Relu()
     relu3 = Relu()
     relu4 = Relu()
-    relu5 = Relu()
-    relu6 = Relu()
-    relu7 = Relu()
 
     fc = FCLayer(fully_con_hparams)
     fc2 = FCLayer(fully_con_hparams)
-    fc3 = FCLayer(fully_con_hparams)
-    fc4 = FCLayer(fully_con_hparams2)
-    fc5 = FCLayer(fully_con_hparams2)
-    fc6 = FCLayer(fully_con_hparams2)
-    fc7 = FCLayer(fully_con_hparams2)
     fc_final = FCLayer(fully_con_hparams_f)
 
     sigmoid = Sigmoid()
     flatten = Flatten()
 
-    modules = [cnn, batch_norm, relu, pool, cnn2, batch_norm5, relu5, flatten,
-    fc, batch_norm2, relu2, fc2, batch_norm3, relu3, fc_final, sigmoid]
+    modules = [cnn, batch_norm, relu, pool, cnn2, batch_norm2, relu2, flatten,
+    fc, batch_norm3, relu3, fc2, batch_norm4, relu4, fc_final, sigmoid]
 
     cnn_model = Model(modules, train, test, model_hparams)
 

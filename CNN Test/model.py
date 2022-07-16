@@ -9,7 +9,6 @@ class Model:
         self.batch_size = hparameters["batch_size"]
         self.beta_1 = hparameters["beta_1"]
         self.beta_2 = hparameters["beta_2"]
-        self.lambd = hparameters["lambd"]
 
         self.modules = modules
         self.number_of_mods = len(modules)
