@@ -5,11 +5,11 @@ from matplotlib.image import imread
 import os
 
 image_size = (128,128)
-cat_path = 'PetImages/cats_resized'
+cat_path = 'CNN/PetImages/cats_resized'
 cat_label = 0
-dog_path = 'PetImages/dogs_resized'
+dog_path = 'CNN/PetImages/dogs_resized'
 dog_label = 1
-npy_dir = 'PetImages/npy files'
+npy_dir = 'CNN/PetImages/npy files'
 
 
 # resizes a folder of images (jpg) to a uniform size
